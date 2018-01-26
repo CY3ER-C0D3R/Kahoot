@@ -1,0 +1,56 @@
+RFC - KAHOOT PROJECT - YUVAL STEIN (11.6.17)
+================================
+
+COMMUNICATION BETWEEN SERVER AND WALL CLIENT (BY ORDER):
+--------------------------------------------------------------------------------
+
+CLIENT SIDE:
+1) ['login', 'host-game', 'game-name']
+2) ['wall-display', 'start-update'] ---> START PAGE
+START PAGE ---> 3) ['wall-display', 'game-update', 'first-question']
+4) ['wall-dispay', 'game-updte', 'game update'] ---> GAME PAGE
+GAME PAGE ---> 5)['wall-display', 'game-update, 'round results']---> ROUND RESULTS PAGE --->
+6) ['wall - display', 'next-question']
+7) ['wall - dipaly', 'end-questionnaire']
+
+SERVER SIDE:
+1) ['login', 'host-game', 'game-pin', 'wait-for-players' (TF), ' interval-between-questions']
+2) ['wall-dispay', 'start-update', 'players-in-game']
+3)'wall-dispaly', game-update', 'first-question', 'all answers', 'question', 'all answeres', 'correct-answers'. 'time']
+IF QUESTIONS ARE DONE
+['wall-dispaly', ' game-update, 'None']
+4)['wall-dispaly', 'game-update', 'game-update', 'num-answeres']
+5)['wall-dipaly', 'game-update', round-results', [(player,score), (player, score).....] T/F]
+6)['wall -dispaly', 'next-question','all-answers,
+7)['wall-dipaly', 'end-questionnaire', 'winners'
+
+
+COMMUNICATION BETWEEN SERVER AND GAME CLIENT (BY ORDER):
+--------------------------------------------------------------------------------
+
+CLIENT SIDE:
+1) ['join', 'validate', 'gamename', 'gamepin'] ---> GAME PAGE ENTRY
+2) GAME PAGE ENTRY ---> ['join', 'playername'] ---> WAITING SCREEN
+3) WAITING SCREEN ---> ['game', 'answer', 'answer', 'playername']
+
+SERVER SIDE:
+1) ['join', 'request', T/F] *(if False, server sends ['join', 'request', False, {'join':'info'}]
+2) ['join', T/F, 'playername', 'msg']
+3) ['game', 'answers', [answers]]
+4) ['game', 'round_results', T/F, points]
+5) ['game', 'final_results', place, points]
+
+* server can send at any point the message: ['error', 'msg'], if for example there are less than two clients in a game or if the the server is closed.
+
+
+### ADDITIONAL GENERAL INFO  ###
+=========================
+
+The server handles the clients using the 'select' method. Each time a client wants something from the server or the server wants to give the client data/information, they both use the above RFC.
+The clients use the tkinter 'after' method and therefore can recive and send data without any problem. The handle the data accordingly. The clients are set to 'noblocking' (socket.setblocking(0))
+in order to get the data without problems. 
+The wall handles the timing of the game and tell the server when to send the next question/info to the clients.
+The server can run several games at once all in one select. Each client receives the data he needs and interperates it.
+
+
+
